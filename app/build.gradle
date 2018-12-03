@@ -30,14 +30,19 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.config
+            buildConfigField "String", "CLIENT_ID", "\"467576804687-5o03r1htceo3fgr5mi1mb8rvqti2pn8p.apps.googleusercontent.com\""
         }
         debug {
             signingConfig signingConfigs.config
+            buildConfigField "String", "CLIENT_ID", "\"467576804687-5o03r1htceo3fgr5mi1mb8rvqti2pn8p.apps.googleusercontent.com\""
         }
     }
 }
 
 dependencies {
+    implementation "com.google.android.gms:play-services-fitness:$google_play_services_version"
+    implementation "com.google.android.gms:play-services-auth:$google_play_services_version"
+
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:27.1.1'
