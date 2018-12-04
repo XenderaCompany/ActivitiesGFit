@@ -15,10 +15,8 @@ import android.widget.Button
 import android.widget.TextView
 import com.dmitriisalenko.gfit.activities.activitiesgfit.R
 import com.dmitriisalenko.gfit.activities.activitiesgfit.R.id.*
-import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.*
 import com.google.android.gms.auth.api.signin.GoogleSignIn.hasPermissions
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.Scopes
@@ -71,7 +69,7 @@ class MainFragment : Fragment() {
             viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
 
             viewModel.processing = false
-            viewModel.hasPermission = resultCode == GoogleSignInStatusCodes.SUCCESS || resultCode == GoogleSignInStatusCodes.SUCCESS_CACHE
+            viewModel.hasPermission = resultCode == Activity.RESULT_OK
             viewModel.requestPermissionStatusCode = resultCode
 
             render()
@@ -124,6 +122,13 @@ class MainFragment : Fragment() {
                 if (it.isSuccessful) {
                     viewModel.hasPermission = false
                 } else {
+// if we have SignIn Required error here, how to handle it correctly?
+//                    val gsio = GoogleSignInOptions.Builder()
+//                        .requestScopes(Scope(Scopes.FITNESS_ACTIVITY_READ), Scope(Scopes.FITNESS_ACTIVITY_READ))
+//                        .build()
+//                    val client = GoogleSignIn.getClient(context, gsio)
+//                    val intent = client.signInIntent
+//                    activity?.startActivityForResult(intent, REQUEST_CODE)
                     viewModel.error = it.exception.toString()
                 }
 
@@ -164,9 +169,15 @@ class MainFragment : Fragment() {
                 ?.setOnClickListener { requestPermissions() }
 
             val statusCode = viewModel.requestPermissionStatusCode
-            if (statusCode != GoogleSignInStatusCodes.SUCCESS && statusCode != GoogleSignInStatusCodes.SUCCESS_CACHE) {
-                request_permissions_status.visibility = View.VISIBLE
-                request_permissions_status.text = GoogleSignInStatusCodes.getStatusCodeString(statusCode)
+            if (statusCode != Activity.RESULT_OK) {
+
+                if (statusCode == Activity.RESULT_CANCELED) {
+                    request_permissions_status.visibility = View.VISIBLE
+                    request_permissions_status.text = "Cancelled"
+                } else {
+                    request_permissions_status.visibility = View.GONE
+                }
+
             } else {
                 request_permissions_status.visibility = View.GONE
             }

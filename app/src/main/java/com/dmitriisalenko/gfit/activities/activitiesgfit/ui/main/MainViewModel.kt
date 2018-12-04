@@ -1,5 +1,6 @@
 package com.dmitriisalenko.gfit.activities.activitiesgfit.ui.main
 
+import android.app.Activity
 import android.arch.lifecycle.ViewModel
 
 class MainViewModel : ViewModel() {
@@ -8,8 +9,7 @@ class MainViewModel : ViewModel() {
     var isPlayServicesAvailable: Boolean = false
     var hasPermission : Boolean = false
 
-    var requestPermissionStatusCode = 0
-    var requestPermissionStatusMessage = ""
+    var requestPermissionStatusCode = Activity.RESULT_OK
 
     var error : String? = null
 
