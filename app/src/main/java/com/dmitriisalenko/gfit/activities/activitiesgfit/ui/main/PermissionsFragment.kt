@@ -3,6 +3,7 @@ package com.dmitriisalenko.gfit.activities.activitiesgfit.ui.main
 import android.Manifest
 import android.app.Activity
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -13,8 +14,11 @@ import android.view.View
 import android.view.ViewGroup
 import com.dmitriisalenko.gfit.activities.activitiesgfit.R
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.common.Scopes
 import com.google.android.gms.common.api.Scope
+import com.google.android.gms.fitness.Fitness
+import com.google.android.gms.fitness.data.DataType
 import kotlinx.android.synthetic.main.permissions_fragement.*
 
 class PermissionsFragment : Fragment() {
@@ -94,6 +98,7 @@ class PermissionsFragment : Fragment() {
 
         request_location_permission.setOnClickListener { requestLocationPermissions() }
         request_google_fit_permissions.setOnClickListener { requestGoogleFitPermissions() }
+        start_recording.setOnClickListener { startRecording() }
     }
 
     private fun requestLocationPermissions() {
@@ -120,11 +125,39 @@ class PermissionsFragment : Fragment() {
         )
     }
 
+    private fun startRecording() {
+        val ctx = context
+        val gsa = GoogleSignIn.getLastSignedInAccount(ctx)
+
+        // null safety
+        if (ctx == null || gsa == null) {
+            return
+        }
+
+        viewModel.processing = true
+
+        viewModel.subscriptionStatus.keys.forEach { subscribeToDataType(it, ctx, gsa) }
+    }
+
+    private fun subscribeToDataType(dt: DataType, ctx: Context, gsa: GoogleSignInAccount) {
+        Fitness.getRecordingClient(ctx, gsa)
+            .subscribe(dt)
+            .addOnSuccessListener {
+                viewModel.subscriptionStatus[dt] = true
+                render()
+            }
+            .addOnFailureListener {
+                viewModel.subscriptionStatus[dt] = false
+                render()
+            }
+    }
+
     private fun render() {
         // hide all elements
         listOf(
             location_access,
-            google_fit_access
+            google_fit_access,
+            recording_api
         ).forEach {
             it.visibility = View.GONE
         }
@@ -157,6 +190,17 @@ class PermissionsFragment : Fragment() {
             return
         }
 
+        val isRecording = viewModel.subscriptionStatus.values.all { it }
+
+        if (isRecording) {
+            // go to next screen
+            return
+        }
+
         step_view.go(2, true)
+
+        recording_api.visibility = View.VISIBLE
+        recording_status.text = "No recording"
+        start_recording.isEnabled = !viewModel.processing
     }
 }

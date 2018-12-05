@@ -189,9 +189,6 @@ class MainFragment : Fragment() {
                     Log.v("Failure subscription", "Failure subscription $dt $e")
                 }
         }
-//
-//        Fitness.getRecordingClient(ctx, gsa)
-//            .subscribe()
     }
 
     private fun render() {
