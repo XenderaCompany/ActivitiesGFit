@@ -61,16 +61,22 @@ class PermissionsFragment : Fragment() {
             }
 
             render()
-        } else if (requestCode == requestGoogleFitPermissionsCode) {
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == requestGoogleFitPermissionsCode) {
             viewModel.processing = false
-//            viewModel.googleFitPermissions = resultCode == Activity.RESULT_OK
-//
-//            if (resultCode != Activity.RESULT_OK) {
-//                viewModel.googleFitPermissionsError = when (resultCode) {
-//                    Activity.RESULT_CANCELED -> "Cancelled"
-//                    else -> "Unknown error"
-//                }
-//            }
+            viewModel.googleFitPermissions = resultCode == Activity.RESULT_OK
+
+            if (resultCode != Activity.RESULT_OK) {
+                viewModel.googleFitPermissionsError = when (resultCode) {
+                    Activity.RESULT_CANCELED -> "Cancelled"
+                    else -> "Unknown error"
+                }
+            }
 
             render()
         }
@@ -87,6 +93,7 @@ class PermissionsFragment : Fragment() {
         )
 
         request_location_permission.setOnClickListener { requestLocationPermissions() }
+        request_google_fit_permissions.setOnClickListener { requestGoogleFitPermissions() }
     }
 
     private fun requestLocationPermissions() {
@@ -98,10 +105,26 @@ class PermissionsFragment : Fragment() {
         requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), requestLocationPermissionCode)
     }
 
+    private fun requestGoogleFitPermissions() {
+        viewModel.processing = true
+        viewModel.googleFitPermissionsError = null
+
+        render()
+
+        GoogleSignIn.requestPermissions(
+            this,
+            requestGoogleFitPermissionsCode,
+            GoogleSignIn.getLastSignedInAccount(context),
+            Scope(Scopes.FITNESS_ACTIVITY_READ),
+            Scope(Scopes.FITNESS_LOCATION_READ)
+        )
+    }
+
     private fun render() {
         // hide all elements
         listOf(
-            location_access
+            location_access,
+            google_fit_access
         ).forEach {
             it.visibility = View.GONE
         }
@@ -123,6 +146,17 @@ class PermissionsFragment : Fragment() {
 
             step_view.go(1, true)
 
+            google_fit_access.visibility = View.VISIBLE
+            request_google_fit_permissions.isEnabled = !viewModel.processing
+
+            request_google_fit_permissions_error.text = if (viewModel.googleFitPermissionsError == null)
+                "No permissions"
+            else
+                viewModel.googleFitPermissionsError
+
+            return
         }
+
+        step_view.go(2, true)
     }
 }
