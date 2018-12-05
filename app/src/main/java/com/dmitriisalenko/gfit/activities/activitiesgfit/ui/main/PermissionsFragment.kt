@@ -42,8 +42,6 @@ class PermissionsFragment : Fragment() {
         viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
 
         init()
-
-        render()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -99,6 +97,31 @@ class PermissionsFragment : Fragment() {
         request_location_permission.setOnClickListener { requestLocationPermissions() }
         request_google_fit_permissions.setOnClickListener { requestGoogleFitPermissions() }
         start_recording.setOnClickListener { startRecording() }
+
+        if (viewModel.googleFitPermissions) {
+            val ctx = context
+            val gsa = GoogleSignIn.getLastSignedInAccount(ctx)
+
+            if (ctx != null && gsa != null) {
+                var count = 0
+                Fitness.getRecordingClient(ctx, gsa)
+                    .listSubscriptions()
+                    .addOnSuccessListener { listSubscription ->
+                        listSubscription.forEach {
+                            count++
+                            viewModel.subscriptionStatus[it.dataType] = true
+
+                            if (count == listSubscription.size) {
+                                // dirty hack to render when get all result
+                                render()
+                            }
+                        }
+
+                    }
+            }
+        } else {
+            render()
+        }
     }
 
     private fun requestLocationPermissions() {
