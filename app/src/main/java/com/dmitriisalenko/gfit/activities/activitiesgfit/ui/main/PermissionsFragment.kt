@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.dmitriisalenko.gfit.activities.activitiesgfit.MainActivity
 import com.dmitriisalenko.gfit.activities.activitiesgfit.R
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -216,7 +217,9 @@ class PermissionsFragment : Fragment() {
         val isRecording = viewModel.subscriptionStatus.values.all { it }
 
         if (isRecording) {
-            // go to next screen
+            val mainActivity = activity as MainActivity
+            mainActivity.goToActivities()
+
             return
         }
 
