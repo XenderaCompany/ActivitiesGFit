@@ -42,6 +42,7 @@ android {
 dependencies {
     implementation "com.google.android.gms:play-services-fitness:$google_play_services_version"
     implementation "com.google.android.gms:play-services-auth:$google_play_services_version"
+    implementation 'com.shuhart.stepview:stepview:1.4.0'
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

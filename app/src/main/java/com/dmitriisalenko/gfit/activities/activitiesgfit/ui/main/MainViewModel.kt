@@ -14,4 +14,11 @@ class MainViewModel : ViewModel() {
     var error : String? = null
 
     var processing : Boolean = false
+
+    // new structure
+    var locationPermission : Boolean = false
+    var locationPermissionError: String? = null
+
+    var googleFitPermissions : Boolean = false
+    var googleFitPermissionsError : String? = null
 }
