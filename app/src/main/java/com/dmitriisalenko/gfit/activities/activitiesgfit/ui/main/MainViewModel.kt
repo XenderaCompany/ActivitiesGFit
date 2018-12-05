@@ -2,6 +2,7 @@ package com.dmitriisalenko.gfit.activities.activitiesgfit.ui.main
 
 import android.app.Activity
 import android.arch.lifecycle.ViewModel
+import com.dmitriisalenko.gfit.activities.activitiesgfit.data.DataBucket
 import com.google.android.gms.fitness.data.DataType
 
 class MainViewModel : ViewModel() {
@@ -41,4 +42,7 @@ class MainViewModel : ViewModel() {
         DataType.TYPE_LOCATION_TRACK to false,
         DataType.TYPE_LOCATION_SAMPLE to false
     )
+
+    // activities
+    var activities : List<DataBucket>? = null
 }
