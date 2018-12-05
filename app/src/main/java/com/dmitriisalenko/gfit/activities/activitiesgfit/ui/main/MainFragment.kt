@@ -1,5 +1,6 @@
 package com.dmitriisalenko.gfit.activities.activitiesgfit.ui.main
 
+import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
 import android.arch.lifecycle.Observer
@@ -8,6 +9,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
+import android.support.v4.content.PermissionChecker
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,12 +29,14 @@ import com.google.android.gms.common.api.Scope
 import com.google.android.gms.common.util.ScopeUtil
 import com.google.android.gms.fitness.Fitness
 import com.google.android.gms.fitness.FitnessOptions
+import com.google.android.gms.fitness.data.DataType
 import com.google.android.gms.tasks.OnCompleteListener
 import kotlinx.android.synthetic.main.main_fragment.*
 
 class MainFragment : Fragment() {
 
     private val REQUEST_CODE = 2018
+    private val LOCATION_REQUEST_CODE = 2019
 
     companion object {
         fun newInstance() = MainFragment()
@@ -71,6 +77,10 @@ class MainFragment : Fragment() {
             viewModel.processing = false
             viewModel.hasPermission = resultCode == Activity.RESULT_OK
             viewModel.requestPermissionStatusCode = resultCode
+
+            if (viewModel.hasPermission) {
+                enableRecordingApi()
+            }
 
             render()
         }
@@ -136,6 +146,52 @@ class MainFragment : Fragment() {
 
                 render()
             }
+    }
+
+    private fun enableRecordingApi() {
+        val ctx = context
+        val gsa = GoogleSignIn.getLastSignedInAccount(ctx)
+
+        if (ctx == null || gsa == null) {
+            return
+        }
+
+        if (ctx.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PermissionChecker.PERMISSION_GRANTED) {
+            Log.v("Subscription failure", "Subscription failure: ACCESS_FINE_LOCATION is not granted")
+            activity?.requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_REQUEST_CODE)
+            return
+        }
+
+        listOf(
+            DataType.TYPE_ACTIVITY_SAMPLES,
+            DataType.TYPE_ACTIVITY_SEGMENT,
+            DataType.TYPE_DISTANCE_DELTA,
+            DataType.TYPE_DISTANCE_CUMULATIVE,
+            DataType.TYPE_STEP_COUNT_DELTA,
+            DataType.TYPE_STEP_COUNT_CADENCE,
+            DataType.TYPE_STEP_COUNT_CUMULATIVE,
+            DataType.TYPE_LOCATION_SAMPLE,
+            DataType.TYPE_LOCATION_TRACK,
+
+            // aggregated?
+            DataType.AGGREGATE_ACTIVITY_SUMMARY,
+            DataType.AGGREGATE_DISTANCE_DELTA,
+            DataType.AGGREGATE_STEP_COUNT_DELTA
+        ).forEach {
+            val dt = it.name
+            Fitness.getRecordingClient(ctx, gsa)
+                .subscribe(it)
+                .addOnSuccessListener {
+                    Log.v("Success subscription", "Success subscription $dt")
+                }
+                .addOnFailureListener {
+                    val e = it.localizedMessage
+                    Log.v("Failure subscription", "Failure subscription $dt $e")
+                }
+        }
+//
+//        Fitness.getRecordingClient(ctx, gsa)
+//            .subscribe()
     }
 
     private fun render() {
