@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import com.dmitriisalenko.gfit.activities.activitiesgfit.R
 import com.dmitriisalenko.gfit.activities.activitiesgfit.data.DataActivity
 import com.dmitriisalenko.gfit.activities.activitiesgfit.data.DataBucket
@@ -42,12 +43,15 @@ class ActivitiesFragment : Fragment() {
     }
 
     private fun init() {
+        readActivities()
+    }
+
+    private fun readActivities() {
         val ctx = context
         val gsa = GoogleSignIn.getLastSignedInAccount(ctx)
 
-        if (ctx == null || gsa == null) {
-            return
-        }
+        ctx ?: return
+        gsa ?: return
 
         val calendar = Calendar.getInstance()
         val now = Date()
@@ -102,6 +106,12 @@ class ActivitiesFragment : Fragment() {
         val buckets = viewModel.buckets!!.reversed() as ArrayList<DataBucket>
 
         data_container.visibility = View.VISIBLE
+        data_container.isRefreshing = false
+
+        data_container.setOnRefreshListener {
+            readActivities()
+        }
+
         list_container.adapter = BucketAdapter(context as Context, buckets)
     }
 }
