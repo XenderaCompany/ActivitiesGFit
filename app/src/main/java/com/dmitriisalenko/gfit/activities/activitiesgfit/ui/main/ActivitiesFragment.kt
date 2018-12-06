@@ -4,10 +4,13 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.TextView
+import com.dmitriisalenko.gfit.activities.activitiesgfit.MainActivity
 import com.dmitriisalenko.gfit.activities.activitiesgfit.R
 import com.dmitriisalenko.gfit.activities.activitiesgfit.data.DataActivity
 import com.dmitriisalenko.gfit.activities.activitiesgfit.data.DataBucket
@@ -22,7 +25,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
-class ActivitiesFragment : Fragment() {
+class ActivitiesFragment : Fragment(), AdapterView.OnItemClickListener {
 
     companion object {
         fun newInstance() = ActivitiesFragment()
@@ -32,6 +35,12 @@ class ActivitiesFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.activities_fragment, container, false)
+    }
+
+    override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        viewModel.selectedActivity = (view as ActivityItemView).dataActivity
+
+        (activity as MainActivity).goToActivity()
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -60,8 +69,6 @@ class ActivitiesFragment : Fragment() {
         calendar.add(Calendar.MONTH, -3)
         val startTime = calendar.timeInMillis
 
-        val dateFormat = DateFormat.getDateInstance()
-        val timeFormat = DateFormat.getTimeInstance()
 
         val readRequest = DataReadRequest.Builder()
             .aggregate(DataType.TYPE_ACTIVITY_SEGMENT, DataType.AGGREGATE_ACTIVITY_SUMMARY)
@@ -75,16 +82,17 @@ class ActivitiesFragment : Fragment() {
                 viewModel.buckets = it.buckets
                     .filter { bucket -> bucket.dataSets[0].dataPoints.size > 0 }
                     .map { bucket ->
-                        DataBucket(
-                            dateFormat.format(bucket.getStartTime(TimeUnit.MILLISECONDS)),
-                            bucket.dataSets[0].dataPoints.map { dataPoint ->
-                                DataActivity(
-                                    dataPoint.getValue(Field.FIELD_ACTIVITY).asActivity(),
-                                    timeFormat.format(dataPoint.getStartTime(TimeUnit.MILLISECONDS)),
-                                    timeFormat.format(dataPoint.getEndTime(TimeUnit.MILLISECONDS))
-                                )
-                            }
-                        )
+                        val dataBucket = DataBucket(bucket.getStartTime(TimeUnit.MILLISECONDS))
+                        dataBucket.activities = bucket.dataSets[0].dataPoints.map { dataPoint ->
+                            DataActivity(
+                                dataBucket,
+                                dataPoint.getValue(Field.FIELD_ACTIVITY).asActivity(),
+                                dataPoint.getStartTime(TimeUnit.MILLISECONDS),
+                                dataPoint.getEndTime(TimeUnit.MILLISECONDS)
+                            )
+                        }
+
+                        dataBucket
                     }
 
                 render()
@@ -112,6 +120,6 @@ class ActivitiesFragment : Fragment() {
             readActivities()
         }
 
-        list_container.adapter = BucketAdapter(context as Context, buckets)
+        list_container.adapter = BucketAdapter(context as Context, buckets, this)
     }
 }

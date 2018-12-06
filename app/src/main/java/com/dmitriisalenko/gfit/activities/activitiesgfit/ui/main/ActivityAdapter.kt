@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter
 import com.dmitriisalenko.gfit.activities.activitiesgfit.R
 import com.dmitriisalenko.gfit.activities.activitiesgfit.data.DataActivity
 import kotlinx.android.synthetic.main.activity_item.view.*
+import java.text.DateFormat
 
 class ActivityAdapter(
     private val ctx : Context,
@@ -19,7 +20,11 @@ class ActivityAdapter(
 
         val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.activity_item, parent, false)
 
-        view.activity_time.text = "${dataActivity.startTime} - ${dataActivity.endTime}"
+        (view as ActivityItemView).dataActivity = dataActivity
+
+        val timeFormat = DateFormat.getTimeInstance()
+
+        view.activity_time.text = "${timeFormat.format(dataActivity.startTime)} - ${timeFormat.format(dataActivity.endTime)}"
         view.activity_name.text = dataActivity.activity
 
         return view

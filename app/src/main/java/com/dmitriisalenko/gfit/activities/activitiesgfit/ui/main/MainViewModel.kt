@@ -2,6 +2,7 @@ package com.dmitriisalenko.gfit.activities.activitiesgfit.ui.main
 
 import android.app.Activity
 import android.arch.lifecycle.ViewModel
+import com.dmitriisalenko.gfit.activities.activitiesgfit.data.DataActivity
 import com.dmitriisalenko.gfit.activities.activitiesgfit.data.DataBucket
 import com.google.android.gms.fitness.data.DataType
 
@@ -45,4 +46,6 @@ class MainViewModel : ViewModel() {
 
     // buckets
     var buckets : List<DataBucket>? = null
+
+    var selectedActivity: DataActivity? = null
 }

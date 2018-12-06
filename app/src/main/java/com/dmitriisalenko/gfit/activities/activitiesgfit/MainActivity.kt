@@ -6,6 +6,7 @@ import android.os.Bundle
 import com.dmitriisalenko.gfit.activities.activitiesgfit.ui.main.MainFragment
 import android.R.attr.data
 import com.dmitriisalenko.gfit.activities.activitiesgfit.ui.main.ActivitiesFragment
+import com.dmitriisalenko.gfit.activities.activitiesgfit.ui.main.ActivityFragment
 import com.dmitriisalenko.gfit.activities.activitiesgfit.ui.main.PermissionsFragment
 
 
@@ -27,4 +28,9 @@ class MainActivity : AppCompatActivity() {
             .commitNow()
     }
 
+    fun goToActivity() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.container, ActivityFragment.newInstance())
+            .commitNow()
+    }
 }
