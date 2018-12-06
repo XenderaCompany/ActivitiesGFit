@@ -40,7 +40,9 @@ class PermissionsFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
+        viewModel = activity?.run {
+            ViewModelProviders.of(this).get(MainViewModel::class.java)
+        } ?: throw Exception("Invalid Activity")
 
         init()
     }
