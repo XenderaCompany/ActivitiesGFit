@@ -94,7 +94,7 @@ class ActivityFragment : Fragment() {
                 Log.v("bla bla", "bla bla failure ${it.localizedMessage}")
             }
 
-        if (listOf("walking", "running", "cycling", "in_vehicle").contains(activity.activity)) Fitness.getHistoryClient(ctx, gsa)
+        if (listOf("walking", "running", "cycling", "in_vehicle", "biking").contains(activity.activity)) Fitness.getHistoryClient(ctx, gsa)
             .readData(DataReadRequest.Builder()
                 .read(DataType.TYPE_DISTANCE_DELTA)
                 .setTimeRange(activity.startTime, activity.endTime, TimeUnit.MILLISECONDS)

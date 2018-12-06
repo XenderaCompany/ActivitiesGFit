@@ -68,7 +68,7 @@ class ActivitiesFragment : Fragment(), AdapterView.OnItemClickListener {
         val now = Date()
         calendar.time = now
         val endTime = calendar.timeInMillis
-        calendar.add(Calendar.MONTH, -3)
+        calendar.add(Calendar.MONTH, -6)
         calendar.set(Calendar.HOUR, 0)
         calendar.set(Calendar.MINUTE, 0)
         calendar.set(Calendar.SECOND, 0)
