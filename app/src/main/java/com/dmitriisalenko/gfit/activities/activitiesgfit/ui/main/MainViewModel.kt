@@ -43,6 +43,6 @@ class MainViewModel : ViewModel() {
         DataType.TYPE_LOCATION_SAMPLE to false
     )
 
-    // activities
-    var activities : List<DataBucket>? = null
+    // buckets
+    var buckets : List<DataBucket>? = null
 }

@@ -186,6 +186,8 @@ class PermissionsFragment : Fragment() {
             it.visibility = View.GONE
         }
 
+        permission_fragment.visibility = View.VISIBLE
+
         if (!viewModel.locationPermission) {
 
             location_access.visibility = View.VISIBLE

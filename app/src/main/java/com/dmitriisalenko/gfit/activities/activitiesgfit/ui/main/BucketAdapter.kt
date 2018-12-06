@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import com.dmitriisalenko.gfit.activities.activitiesgfit.R
+import com.dmitriisalenko.gfit.activities.activitiesgfit.data.DataActivity
 import com.dmitriisalenko.gfit.activities.activitiesgfit.data.DataBucket
 import kotlinx.android.synthetic.main.bucket_item.view.*
 
@@ -19,8 +20,12 @@ class BucketAdapter(
 
         val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.bucket_item, parent, false)
 
+        val activities = bucket.activities as ArrayList
+
+        activities.reverse()
+
         view.bucket_date.text = bucket.date
-        view.bucket_activities.adapter = ActivityAdapter(context, bucket.activities as ArrayList)
+        view.bucket_activities.adapter = ActivityAdapter(context, activities)
 
         return view
     }
